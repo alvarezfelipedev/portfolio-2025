@@ -8,21 +8,22 @@ import { dateRange } from "@lib/utils";
 import { SITE, HOME, SOCIALS } from "@consts";
 
 
+const blog = (await getCollection("blog"))
+  .filter(blog => !blog.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0,SITE.NUM_BLOGS_ON_HOMEPAGE);
+
 const projects = (await getCollection("projects"))
-  .filter((project: { data: { draft: boolean } }) => !project.data.draft)
-  .sort((a: { data: { date: Date } }, b: { data: { date: Date } }) =>
-    b.data.date.valueOf() - a.data.date.valueOf()
-  )
-  .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0,SITE.NUM_PROJECTS_ON_HOMEPAGE);
 
 const allwork = (await getCollection("work"))
-  .sort((a: { data: { dateStart: Date } }, b: { data: { dateStart: Date } }) =>
-    new Date(b.data.dateStart).valueOf() - new Date(a.data.dateStart).valueOf()
-  )
-  .slice(0, SITE.NUM_WORKS_ON_HOMEPAGE);
+  .sort((a, b) => new Date(b.data.dateStart).valueOf() - new Date(a.data.dateStart).valueOf())
+  .slice(0,SITE.NUM_WORKS_ON_HOMEPAGE);
 
 const work = await Promise.all(
-  allwork.map(async (item: unknown) => {
+  allwork.map(async (item) => {
     const { Content } = await item.render();
     return { ...item, Content };
   })
@@ -53,9 +54,9 @@ const work = await Promise.all(
           <h5 class="font-semibold text-black dark:text-white">
             Experiencia laboral
           </h5>
-          <!-- <Link href="/work">
-            See all work
-            </Link> -->
+            <Link href="https://drive.google.com/file/d/1zrT3Yn2V3EFgJeGfT-rFMu90nAsqcUqH/view" external>
+              Ver más
+            </Link>
         </div>
         <ul class="flex flex-col space-y-4">
           {work.map(entry => (
@@ -74,6 +75,7 @@ const work = await Promise.all(
               </article>
             </li>
           ))}
+          
         </ul>
       </section>
       
@@ -87,9 +89,27 @@ const work = await Promise.all(
           </Link> -->
       </div>
         <ul class="flex flex-col gap-4">
-          {projects.map((project: unknown) => (
+          {projects.map((project) => (
             <li>
               <ArrowCard entry={project} />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="animate space-y-6">
+        <div class="flex flex-wrap gap-y-2 items-center justify-between">
+          <h5 class="font-semibold text-black dark:text-white">
+            Últimos blogs
+          </h5>
+          <Link href="/blog">
+            Ver más
+          </Link>
+        </div>
+        <ul class="flex flex-col gap-4">
+          {blog.map(blog => (
+            <li>
+              <ArrowCard entry={blog} />
             </li>
           ))}
         </ul>
